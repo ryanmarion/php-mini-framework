@@ -6,6 +6,10 @@ $app = new App\App;
 
 $container = $app->getContainer();
 
+$container['errorHandler'] = function(){
+    die('404');
+};
+
 $container['config'] = function(){
     return [
         'db_driver' => 'mysql',
@@ -24,7 +28,7 @@ $container['db'] = function($c){
 };
 
 $app->get('/', function(){
-    echo 'home';
+    echo 'hello';
 });
 
 $app->post('/signup', function(){
