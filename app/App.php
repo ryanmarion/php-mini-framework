@@ -12,6 +12,9 @@ class App {
         $this->container = new Container([
             'router' => function(){
                 return new Router;
+            },
+            'response' => function(){
+                return new Response;
             }
         ]);
     }
@@ -52,10 +55,39 @@ class App {
             }
         }
 
-        return $this->process($response);
+        return $this->respond($this->process($response));
     }
 
     protected function process($callable){
-        return $callable();
+        $response = $this->container->response;
+
+        if(is_array($callable)){
+            if(!is_object($callable[0])){
+                $callable[0] = new $callable[0];
+            }
+            return call_user_func($callable, $response);
+        }
+        return $callable($response);
+    }
+
+    protected function respond($response){
+        if(!$response instanceof Response){
+            echo $response;
+            return;
+        }
+
+        header(sprintf(
+            'HTTP/%s %s %s',
+            '1.1',
+            $response->getStatus(),
+            ''
+        ));
+
+        foreach($response->getHeaders() as $header){
+            header($header[0] . ": " . $header[1]);
+        }
+
+        echo $response->getBody();
+
     }
 }

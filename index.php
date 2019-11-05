@@ -1,13 +1,17 @@
 <?php
 
 require 'vendor/autoload.php';
+use App\Controllers\HomeController;
+use App\Controllers\UserController;
 
 $app = new App\App;
 
 $container = $app->getContainer();
 
 $container['errorHandler'] = function(){
-    die('404');
+    return function($response){
+        return $response->setBody('Page not found')->withStatus(404);
+    };
 };
 
 $container['config'] = function(){
@@ -16,7 +20,7 @@ $container['config'] = function(){
         'host' => 'localhost',
         'db_name' => 'framework_db',
         'db_user' => 'root',
-        'db_pass' => 'root'
+        'db_pass' => ''
     ];
 };
 
@@ -27,16 +31,15 @@ $container['db'] = function($c){
         $c->config['db_pass']);
 };
 
-$app->get('/', function(){
-    echo 'hello';
-});
+$app->get('/', [new HomeController($container->db),'index']);
+$app->get('/users', [new UserController($container->db),'index']);
 
-$app->post('/signup', function(){
+$app->get('/signup', function(){
     echo 'signup';
 });
 
-$app->map('/users', function(){
-    echo 'users';
-}, ['GET','POST']);
+// $app->map('/users', function(){
+//     echo 'users';
+// }, ['GET','POST']);
 
 $app->run();
