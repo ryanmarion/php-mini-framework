@@ -31,7 +31,7 @@ $container['db'] = function($c){
         $c->config['db_pass']);
 };
 
-$app->get('/', [new HomeController($container->db),'index']);
+$app->get('/', [new HomeController,'index']);
 $app->get('/users', [new UserController($container->db),'index']);
 
 $app->get('/signup', function(){
